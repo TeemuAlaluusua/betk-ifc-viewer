@@ -1,15 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>BETK IFC Viewer</title>
   <style>
     body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
   </style>
 </head>
 <body>
-  <input type="file" id="file-input" />
-  <script type="module" src="./main.js"></script>
+
+<input type="file" id="file-input" />
+
+<script type="module">
+import * as THREE from 'https://cdn.skypack.dev/three';
+import { IFCLoader } from 'https://cdn.skypack.dev/web-ifc-three/IFCLoader';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const light = new THREE.AmbientLight(0xffffff);
+scene.add(light);
+
+const loader = new IFCLoader();
+
+document.getElementById('file-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const url = URL.createObjectURL(file);
+  const model = await loader.loadAsync(url);
+  scene.add(model);
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+
 </body>
 </html>
